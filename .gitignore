@@ -1,0 +1,43 @@
+# Python bytecode/cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+.env
+.env.*
+!.env.example
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Test/coverage tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Data engineering outputs
+logs/
+tmp/
+artifacts/
+reports/
+
+# Data tiers (keep external trackable)
+data/raw/
+data/interim/
+data/processed/
+data/curated/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
