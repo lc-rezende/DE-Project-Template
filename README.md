@@ -1,4 +1,6 @@
-DE-Project-Template is a data engineering project template for organizing pipelines, data tiers, and operational tooling.
+[![CI](https://github.com/lc-rezende/DE-Project-Template/actions/workflows/ci.yml/badge.svg)](https://github.com/lc-rezende/DE-Project-Template/actions/workflows/ci.yml)
+
+**DE-Project-Template** (Data Engineering Project Template) is a data engineering project template for organizing pipelines, data tiers, and operational tooling.
 
 Disclaimer: This structure was created using OpenAI Codex CLI.
 
