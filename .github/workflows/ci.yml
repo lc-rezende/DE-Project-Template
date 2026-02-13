@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate-template:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate folder READMEs
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Require README.md in every non-hidden directory (skip dot-prefixed dirs like .git/.github/.venv)
+          missing=0
+          while IFS= read -r -d '' dir; do
+            base="$(basename "$dir")"
+            if [[ "$base" == .* ]]; then
+              continue
+            fi
+            if [[ ! -f "$dir/README.md" ]]; then
+              echo "Missing README.md in: $dir"
+              missing=1
+            fi
+          done < <(find . -type d -print0)
+          if [[ "$missing" -ne 0 ]]; then
+            echo "README.md validation failed."
+            exit 1
+          fi
+
+      - name: Check for large files (>5 MB)
+        shell: bash
+        run: |
+          set -euo pipefail
+          limit=$((5 * 1024 * 1024))
+          failed=0
+          while IFS= read -r -d '' file; do
+            size=$(wc -c < "$file")
+            if (( size > limit )); then
+              echo "File exceeds 5 MB: $file ($size bytes)"
+              failed=1
+            fi
+          done < <(git ls-files -z)
+          if [[ "$failed" -ne 0 ]]; then
+            echo "Large file check failed."
+            exit 1
+          fi
+
+      - name: Basic secret pattern scan
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Skip .env.example and .gitignore (template/ignore files may contain placeholders)
+          files=$(git ls-files | grep -vE '^\.env\.example$|^\.gitignore$')
+          if [[ -z "$files" ]]; then
+            exit 0
+          fi
+          # Common secret patterns (basic heuristic)
+          patterns='(AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|SECRET_KEY=|API_KEY=|PASSWORD=|TOKEN=)'
+          if rg -n --hidden --no-ignore-vcs -e "$patterns" $files; then
+            echo "Potential secret pattern found."
+            exit 1
+          fi
