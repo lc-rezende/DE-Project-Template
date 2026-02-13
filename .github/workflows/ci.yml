@@ -19,15 +19,11 @@ jobs:
           # Require README.md in every non-hidden directory (skip dot-prefixed dirs like .git/.github/.venv)
           missing=0
           while IFS= read -r -d '' dir; do
-            base="$(basename "$dir")"
-            if [[ "$base" == .* ]]; then
-              continue
-            fi
             if [[ ! -f "$dir/README.md" ]]; then
               echo "Missing README.md in: $dir"
               missing=1
             fi
-          done < <(find . -type d -print0)
+          done < <(find . -path '*/.*' -prune -o -type d -print0)
           if [[ "$missing" -ne 0 ]]; then
             echo "README.md validation failed."
             exit 1
